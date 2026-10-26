@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.DS_Store
+# 工程和素材不进仓库
+*.mp4
+*.mov
+*.mkv
+*.m4a
+*.mp3
+*.wav
+*.jpg
+*.jpeg
+*.png
+*.ttf
+*.woff2
+*.onnx
+*.bin

@@ -1,0 +1,11 @@
+#!/bin/bash
+# 统一入口：用技能自带的 Python 环境运行 scripts/ 里的工具。
+# 用法：scripts/ths <命令> [参数…]    命令 = prepare / listen / frames / build / deliver / matte / cover_export / new_project / doctor …
+set -e
+HERE="$(cd "$(dirname "$0")" && pwd)"
+THS_HOME="${THS_HOME:-$HOME/.cache/talking-head-shorts}"
+PY="$THS_HOME/venv/bin/python"
+[ -x "$PY" ] || { echo "还没安装：先运行 $(dirname "$HERE")/setup.sh"; exit 1; }
+cmd="$1"; shift || true
+[ -f "$HERE/$cmd.py" ] || { echo "没有这个命令：$cmd"; ls "$HERE" | sed -n 's/\.py$//p' | grep -v -E '^(common|panels)$' | tr '\n' ' '; echo; exit 1; }
+exec "$PY" "$HERE/$cmd.py" "$@"
