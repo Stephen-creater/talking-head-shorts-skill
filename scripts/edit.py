@@ -156,7 +156,7 @@ def build(proj):
     phrases = {p["id"]: p for p in json.load(open(pp["phrases"]))}
     order = list(phrases)
     regs, rms = speech_map(pp["voice"])
-    speed = edl["speed"]; gap_def = edl.get("gap", 0.32)
+    speed = edl["speed"]; gap_def = edl.get("gap", 0.38)
 
     # 1) 每条剪辑表条目 → 精确的有声起止
     items = []
@@ -239,7 +239,7 @@ def build(proj):
     segs = cut
 
     # 2b) 段内的长停顿（她说话常停 1～3 秒）也要压到 gap，段在这里一分为二
-    max_pause = edl.get("max_pause", 0.55)
+    max_pause = edl.get("max_pause", 0.6)
     split = []
     for s in segs:
         a = s["s_in"]

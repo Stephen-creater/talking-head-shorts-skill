@@ -26,10 +26,6 @@ TEMPLATE = {
         "clips": [
             {"file": "$HOME/music/Wholesome.mp3", "offset": 1.244, "start": 0, "end": "END_SPEECH-7.2",
              "level": -31.2, "duck": True, "lift": 5, "fade_in": 0.8, "fade_out": 2.4},
-            {"file": "sources/end_song.m4a", "offset": "26.90-8.46", "start": "END_SPEECH-9.0", "end": "END_SPEECH-0.54",
-             "level": -37.0, "duck": True, "lift": 6, "fade_in": 1.6, "fade_out": 0.45},
-            {"file": "sources/end_song.m4a", "offset": 34.85, "start": "END_SPEECH+0.35", "end": "TOTAL",
-             "level": -15.7, "fade_in": 0.05, "fade_out": 2.4},
         ],
     },
 }
@@ -43,21 +39,27 @@ def main(argv):
         i = rest.index("--end-song"); song = rest[i + 1]; rest = rest[:i] + rest[i + 2:]
     if "--photos" in rest:
         i = rest.index("--photos"); photos = rest[i + 1:]; rest = rest[:i]
+    if (proj / "edl.json").exists():
+        sys.exit(f"{proj / 'edl.json'} 已存在，不覆盖")
     for d in ("sources", "stills", "analysis", "build", "out"):
         (proj / d).mkdir(parents=True, exist_ok=True)
     edl = json.loads(json.dumps(TEMPLATE))
     for v in rest:
         shutil.copy(v, proj / "sources" / Path(v).name)
         edl["sources"].append(f"sources/{Path(v).name}")
-    for p in photos:
-        shutil.copy(p, proj / "sources" / Path(p).name)
+    for p in photos:   # 图形（照片墙、人物出场）只从 stills/ 取图
+        shutil.copy(p, proj / "stills" / Path(p).name)
     if song:
-        shutil.copy(song, proj / ("sources/end_song" + Path(song).suffix))
-        for c in edl["music"]["clips"]:
-            if c["file"].startswith("sources/end_song"):
-                c["file"] = "sources/end_song" + Path(song).suffix
-    if (proj / "edl.json").exists():
-        sys.exit(f"{proj / 'edl.json'} 已存在，不覆盖")
+        f = "sources/end_song" + Path(song).suffix
+        shutil.copy(song, proj / f)
+        # 片尾歌接唱：两个时间点是每首歌各自的（前奏结束秒数、歌手唱出那句的秒数），见 docs/声音.md。
+        # 下面是《Don't Worry Be Happy》录音室版的值，换歌必须改 offset。
+        edl["music"]["clips"] += [
+            {"file": f, "offset": "26.90-8.46", "start": "END_SPEECH-9.0", "end": "END_SPEECH-0.54",
+             "level": -37.0, "duck": True, "lift": 6, "fade_in": 1.6, "fade_out": 0.45},
+            {"file": f, "offset": 34.85, "start": "END_SPEECH+0.35", "end": "TOTAL",
+             "level": -15.7, "fade_in": 0.05, "fade_out": 2.4}]
+        print("已加片尾歌。注意：offset 里的两个时间点要按这首歌改（见 docs/声音.md「片尾歌接唱」）")
     json.dump(edl, open(proj / "edl.json", "w"), ensure_ascii=False, indent=1)
     print(f"工程已建好：{proj}\n下一步：scripts/ths prepare {proj}")
 

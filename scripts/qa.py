@@ -40,7 +40,7 @@ def main(proj, name):
     # 2 回听
     wav = qa / "audio16k.wav"
     sh(["ffmpeg", "-v", "error", "-y", "-i", str(mp4), "-ac", "1", "-ar", "16000", str(wav)])
-    sh([whisper_cli(), "-m", str(WHISPER_MODEL), "-l", "zh", "-mc", "0", "-t", "6",
+    sh([whisper_cli(), "-m", str(WHISPER_MODEL), "-l", json.load(open(proj / "edl.json")).get("language", "zh"), "-mc", "0", "-t", "6",
         "-oj", "-of", str(qa / "asr"), str(wav)])
     asr = json.load(open(qa / "asr.json"))["transcription"]
     heard = "".join(s["text"] for s in asr)

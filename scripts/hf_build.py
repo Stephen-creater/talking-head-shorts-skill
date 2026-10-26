@@ -95,7 +95,7 @@ def build(proj):
     tl = json.load(open(proj / "build/timeline.json"))
     caps = json.load(open(proj / "build/captions.json"))
     A = Anchors(proj)
-    end_extra = edl.get("end_extra", 7.0)
+    end_extra = edl.get("end_extra", 6.8)
     total = round(tl["out_dur"] + end_extra, 3)
     vd = tl["out_dur"]
     hf = proj / "hf"

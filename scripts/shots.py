@@ -34,7 +34,7 @@ def plan(proj):
     from common import probe_size
     size = probe_size(pp["source"])
     segs = tl["segments"]
-    min_shot = edl.get("min_shot", 2.6)
+    min_shot = edl.get("min_shot", 2.8)
     soft_dur = edl.get("soft_frames", 4) / tl["fps"] * tl["speed"]   # 剪辑时间里的软切长度
     covered = [(g["o_in"], g["o_out"]) for g in edl.get("full_cover", [])]
 

@@ -14,12 +14,14 @@ def main(proj, a, b, prompt=None):
     proj = Path(proj).resolve()
     pp = project_paths(proj)
     regs, _ = speech_map(pp["voice"])
+    import json
+    lang = json.load(open(proj / "edl.json")).get("language", "zh")
     with tempfile.TemporaryDirectory() as d:
         w = Path(d) / "r.wav"
         for x, y in [r for r in regs if r[1] > a and r[0] < b]:
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(max(0, x - 0.05)), "-to", str(y + 0.05),
                             "-i", str(pp["voice"]), "-ac", "1", "-ar", "16000", str(w)], check=True)
-            cmd = [whisper_cli(), "-m", str(WHISPER_MODEL), "-l", "zh", "-t", "6", "-nt", str(w)]
+            cmd = [whisper_cli(), "-m", str(WHISPER_MODEL), "-l", lang, "-t", "6", "-nt", str(w)]
             if prompt:
                 cmd += ["--prompt", prompt]
             t = subprocess.run(cmd, capture_output=True, text=True).stdout.strip().replace("\n", " ")

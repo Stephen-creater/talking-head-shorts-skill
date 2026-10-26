@@ -71,7 +71,7 @@ def mix(proj):
     v, _ = sf.read(proj / "build/voice.wav", dtype="float32")
     v = v if v.ndim == 1 else v.mean(1)
     tl = json.load(open(proj / "build/timeline.json"))
-    total = tl["out_dur"] + edl.get("end_extra", 7.0)
+    total = tl["out_dur"] + edl.get("end_extra", 6.8)
     N = int(total * SR)
     t_end = last_speech(v)
     print(f"人声最后一个字结束于 {t_end:.3f}s")

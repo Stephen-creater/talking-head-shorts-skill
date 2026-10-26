@@ -179,7 +179,7 @@ def endcard(ov, k, ctx):
     x, y, w, h = win[:4]
     inner = (f'<div class="pf" id="{cid}f"></div>'
              f'<div class="sg" id="{cid}s">{ov["name"]}</div>'
-             f'<div class="hw"><span id="{cid}h1">{ov.get("say1", "Don&#39;t worry,")}</span> <span id="{cid}h2">{ov.get("say2", "be happy")}</span>'
+             f'<div class="hw"><span id="{cid}h1">{ov.get("say1", "")}</span> <span id="{cid}h2">{ov.get("say2", "")}</span>'
              f'<svg id="{cid}a" viewBox="0 0 420 40" preserveAspectRatio="none"><path d="M6 26 C 120 6, 300 6, 414 22" stroke="var(--gold)" stroke-width="9" fill="none" stroke-linecap="round"/></svg></div>')
     css = (f'#{cid} .pf{{position:absolute;left:{x - 22}px;top:{y - 22}px;width:{w + 44}px;height:{h + 44}px;background:#fff;'
            f'box-shadow:0 26px 70px rgba(58,40,22,.22),0 0 0 1px rgba(42,34,48,.08);}}'
@@ -191,8 +191,9 @@ def endcard(ov, k, ctx):
     js = [_vwrap_to(t0, d, s, tx, ty, clip),
           f'tl.fromTo("#{cid}f",{{opacity:0,scale:1.04}},{{opacity:1,scale:1,duration:0.6,ease:{EASE}}},{t0 + 0.15:.3f});',
           _wipe(f"#{cid}s", A(ov["name_at"]), A(ov["name_end"]) - A(ov["name_at"]) + 0.2),
-          _wipe(f"#{cid}h1", A(ov["h1_at"]), 0.7), _wipe(f"#{cid}h2", A(ov["h2_at"]), 0.6),
-          f'tl.fromTo("#{cid}a",{{clipPath:"inset(0 100% 0 0)"}},{{clipPath:"inset(0 0% 0 0)",duration:0.6,ease:"power2.out"}},{A(ov["arc_at"]):.3f});',
+          *([_wipe(f"#{cid}h1", A(ov["h1_at"]), 0.7), _wipe(f"#{cid}h2", A(ov.get("h2_at", ov["h1_at"])), 0.6),
+             f'tl.fromTo("#{cid}a",{{clipPath:"inset(0 100% 0 0)"}},{{clipPath:"inset(0 0% 0 0)",duration:0.6,ease:"power2.out"}},{A(ov["arc_at"]):.3f});']
+            if ov.get("say1") or ov.get("say2") else [f'tl.set("#{cid}a",{{opacity:0}},0);']),
           # 定格：底片放完后显示最后一帧，并继续极慢推近
           f'tl.fromTo("#freeze",{{opacity:0}},{{opacity:1,duration:0.01}},{ctx["tl"]["out_dur"] - 0.04:.3f});',
           f'tl.fromTo("#vwrap",{{scale:{s},x:{tx:.1f},y:{ty:.1f}}},{{scale:{s * 1.025:.4f},x:{tx - w * 0.0125:.1f},y:{ty - h * 0.0125:.1f},duration:{t1 - t0 - d:.2f},ease:"none",immediateRender:false}},{t0 + d:.3f});']
